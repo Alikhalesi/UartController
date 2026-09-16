@@ -26,7 +26,7 @@ input logic nrst,
 input logic s_tick,
 input logic rx,
 output logic s_tick_rst,
-output logic [31:0] data_out, 
+output logic [7:0] data_out, 
 output logic data_ready
     );
     
@@ -37,14 +37,14 @@ typedef enum logic [1:0] {IDLE=2'b00,START=2'b01,DATA=2'b10,STOP=2'b11} STATE;
 
 STATE current_state,next_state;
 
-logic [31:0] data,next_data;
+logic [7:0] data,next_data;
 
 logic r_s_tick_rst,next_s_tick_rst;
 logic r_data_ready,next_data_ready;
 
 always_ff @(posedge clk, negedge nrst)
     begin
-        if (nrst)
+        if (!nrst)
             begin
                 current_state<=IDLE;
                 baud_count<=0;
@@ -68,8 +68,8 @@ always_ff @(posedge clk, negedge nrst)
 always_comb
     begin
         next_state=current_state;
-        next_baud_count=0;
-        next_bit_count=0;
+        next_baud_count=baud_count;
+        next_bit_count=bit_count;
         next_data=data;
         next_s_tick_rst=0;
         next_data_ready=0;
@@ -80,6 +80,8 @@ always_comb
                         begin
                             next_state=START;
                             next_s_tick_rst=1;
+                            next_bit_count=0;
+                            next_baud_count=0;
                         end                       
                 end
             START:
@@ -87,7 +89,10 @@ always_comb
                    if(s_tick)
                             begin
                                 if(baud_count==7)
-                                    next_state=DATA;
+                                    begin
+                                        next_state=DATA;
+                                        next_baud_count=0;
+                                    end
                                 else
                                     next_baud_count=baud_count+1;
                             end        
@@ -97,7 +102,10 @@ always_comb
                      if(s_tick)
                           begin
                                 if(bit_count==7)
-                                    next_state=STOP;
+                                    begin
+                                        next_state=STOP;
+                                        next_baud_count=0;
+                                    end
                                 else
                                     if(baud_count==16)
                                         begin 
@@ -112,7 +120,7 @@ always_comb
                 begin
                   if(s_tick)
                           begin
-                                if(baud_count==8)
+                                if(baud_count==1)
                                     next_state=IDLE;
                                     
                                 else
