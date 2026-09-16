@@ -25,7 +25,7 @@ module baud_gen #(parameter int FACTOR=16,localparam int BAUD_RATE=9600,localpar
     input logic clk,
     input logic nrst,
     input logic rst,
-    output logic tick
+    output logic[14:0] tick
     );
     
     
