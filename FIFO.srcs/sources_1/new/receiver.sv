@@ -30,7 +30,7 @@ output logic [7:0] data_out,
 output logic data_ready
     );
     
-logic [3:0] baud_count,next_baud_count;    
+logic [4:0] baud_count,next_baud_count;    
 logic [3:0] bit_count,next_bit_count;
 
 typedef enum logic [1:0] {IDLE=2'b00,START=2'b01,DATA=2'b10,STOP=2'b11} STATE;
