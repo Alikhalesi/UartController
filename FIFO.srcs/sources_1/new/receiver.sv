@@ -101,14 +101,15 @@ always_comb
                 begin
                      if(s_tick)
                           begin
-                                if(bit_count==7)
+                                if(bit_count==8)
                                     begin
                                         next_state=STOP;
                                         next_baud_count=0;
                                         next_data_ready=1;
+                                        next_data=0;
                                     end
                                 else
-                                    if(baud_count==16)
+                                    if(baud_count==15)
                                         begin 
                                             next_bit_count=bit_count+1;
                                             next_data={data[6:0],rx};
@@ -122,7 +123,7 @@ always_comb
                 begin
                   if(s_tick)
                           begin
-                                if(baud_count==1)
+                                if(baud_count==23)
                                     next_state=IDLE;
                                     
                                 else

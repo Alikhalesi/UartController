@@ -25,9 +25,9 @@ module tb_receiver(
     );
     
     // --- Core Parameters ---
-    localparam CLK_PERIOD   = 100;   // 100ns for a 10 MHz clock
+    localparam CLK_PERIOD   = 10;   // 10ns for a 100 MHz clock
     localparam OVERSAMPLING = 16;    // 16 ticks per bit period
-    localparam TICK_DIVISOR = 65;    // 10MHz / (9600 * 16) = 65.1
+    localparam TICK_DIVISOR = 651;    // 100MHz / (9600 * 16) = 65.1
 
     // --- Interface Signals ---
     logic       clk;
@@ -169,7 +169,7 @@ module tb_receiver(
 
         // --- Run Tests ---
            
-        send_uart_byte(8'h55); // Alternating bits
+        send_uart_byte(8'b01010101); // Alternating bits
         send_uart_byte(8'hA5); // Mixed pattern
      send_uart_byte(8'hFF); // All ones
 
