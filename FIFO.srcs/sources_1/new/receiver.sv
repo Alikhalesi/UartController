@@ -105,12 +105,14 @@ always_comb
                                     begin
                                         next_state=STOP;
                                         next_baud_count=0;
+                                        next_data_ready=1;
                                     end
                                 else
                                     if(baud_count==16)
                                         begin 
                                             next_bit_count=bit_count+1;
-                                            next_data={rx,data[7:1]};
+                                            next_data={data[6:0],rx};
+                                            next_baud_count=0;
                                         end
                                     else
                                      next_baud_count=baud_count+1;

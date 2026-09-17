@@ -168,9 +168,10 @@ module tb_receiver(
         #(CLK_PERIOD * 5);
 
         // --- Run Tests ---
+           
         send_uart_byte(8'h55); // Alternating bits
         send_uart_byte(8'hA5); // Mixed pattern
-        send_uart_byte(8'hFF); // All ones
+     send_uart_byte(8'hFF); // All ones
 
         // Final hold time before closing
         #(BIT_DURATION_NS * 5);
