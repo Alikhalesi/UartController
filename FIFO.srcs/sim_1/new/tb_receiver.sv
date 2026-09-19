@@ -27,7 +27,6 @@ module tb_receiver(
     // --- Core Parameters ---
     localparam CLK_PERIOD   = 10;   // 10ns for a 100 MHz clock
     localparam OVERSAMPLING = 16;    // 16 ticks per bit period
-    localparam TICK_DIVISOR = 651;    // 100MHz / (9600 * 16) = 65.1
 
     // --- Interface Signals ---
     logic       clk;
@@ -62,29 +61,33 @@ module tb_receiver(
 
     // --- Bulletproof 9600 Baud Tick Generator ---
     logic s_tick_en;
-    integer uut_tick_counter;
 
-    always @(posedge clk or negedge nrst) begin
-        if (!nrst) begin
-            s_tick           <= 0;
-            uut_tick_counter <= 0;
-        end else if (s_tick_en) begin
-            // Safeguard against UUT locking up the testbench tick generator
-            if (s_tick_rst === 1'b1) begin
-                s_tick           <= 0;
-                uut_tick_counter <= 0;
-            end else if (uut_tick_counter >= (TICK_DIVISOR - 1)) begin
-                s_tick           <= 1;
-                uut_tick_counter <= 0;
-            end else begin
-                s_tick           <= 0;
-                uut_tick_counter <= uut_tick_counter + 1;
-            end
-        end else begin
-            s_tick           <= 0;
-            uut_tick_counter <= 0;
-        end
-    end
+
+
+baud_gen buad_gen_instance(.clk(clk),.nrst(nrst),.rst(s_tick_rst),.tick(s_tick));
+
+
+//    always @(posedge clk or negedge nrst) begin
+//        if (!nrst) begin
+//            s_tick           <= 0;
+//            uut_tick_counter <= 0;
+//        end else if (s_tick_en) begin
+//            // Safeguard against UUT locking up the testbench tick generator
+//            if (s_tick_rst === 1'b1) begin
+//                s_tick           <= 0;
+//                uut_tick_counter <= 0;
+//            end else if (uut_tick_counter >= (TICK_DIVISOR - 1)) begin
+//                s_tick           <= 1;
+//                uut_tick_counter <= 0;
+//            end else begin
+//                s_tick           <= 0;
+//                uut_tick_counter <= uut_tick_counter + 1;
+//            end
+//        end else begin
+//            s_tick           <= 0;
+//            uut_tick_counter <= 0;
+//        end
+//    end
 
     // --- Time-Based Task: Send a UART Byte ---
     // This task relies entirely on explicit physical time delays calculated for 9600 baud.
@@ -154,7 +157,7 @@ module tb_receiver(
         nrst        = 1;
         s_tick_en   = 0;
         expect_done = 0;
-        uut_tick_counter = 0;
+  
         
         // Assert reset for 1000 ns (10 clock cycles)
         #(CLK_PERIOD * 10);

@@ -25,11 +25,11 @@ module baud_gen #(parameter int FACTOR=16,localparam int BAUD_RATE=9600,localpar
     input logic clk,
     input logic nrst,
     input logic rst,
-    output logic[14:0] tick
+    output logic tick
     );
     
     
-    localparam int dvsr=(CLOCK/FACTOR*BAUD_RATE)-1;
+    localparam int dvsr=(CLOCK/(FACTOR*BAUD_RATE))-1;
        
     logic [14:0] r_reg,r_next;
     
