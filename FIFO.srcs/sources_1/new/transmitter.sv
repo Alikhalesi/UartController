@@ -56,13 +56,15 @@ module transmitter(
                     r_bit_count<=0;
                 end
              else
-                r_current_state<=next_state;
-                 r_tx<=next_tx;
-                 r_in_data<=next_data;
-                 r_s_tick_rst<=next_s_tick_rst;
-                 r_finish<=next_finish;
-                 r_over_sample_count<=next_over_sample_count;
-                 r_bit_count<=next_bit_count;
+                begin
+                     r_current_state<=next_state;
+                     r_tx<=next_tx;
+                     r_in_data<=next_data;
+                     r_s_tick_rst<=next_s_tick_rst;
+                     r_finish<=next_finish;
+                     r_over_sample_count<=next_over_sample_count;
+                     r_bit_count<=next_bit_count;
+                 end
         end
     
     

@@ -78,7 +78,7 @@ module top(
 .data_out(fifo_write), 
 .data_ready(write_enable));
 
-
+assign led=write_enable;
 
     
 endmodule
