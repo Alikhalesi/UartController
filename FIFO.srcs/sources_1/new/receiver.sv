@@ -125,8 +125,7 @@ always_comb
                                 if(baud_count==23)
                                     begin
                                         next_state=IDLE;
-                                        next_data_ready=1;
-                                        next_data=0;
+                                        next_data_ready=1;                                        
                                     end
                                 else
                                      next_baud_count=baud_count+1;
