@@ -28,8 +28,8 @@ input logic clk,
 input logic nrst,
 input logic w_en,
 input logic r_en,// read operation is asynchronous, this signal just pop the data from FIFO.
-output logic[ADDR_WIDTH-1:0] r_data,
-input logic[ADDR_WIDTH-1:0] w_data,
+output logic[DATA_WIDTH-1:0] r_data,
+input logic[DATA_WIDTH-1:0] w_data,
 output logic empty,full
     );
       
