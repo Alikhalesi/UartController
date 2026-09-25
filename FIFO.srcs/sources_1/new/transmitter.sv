@@ -26,10 +26,12 @@ module transmitter(
     output logic tx,
     input logic [7:0] in_data,
     input logic enable,// means in_data is valid and should be transmitted
-    output logic finish,//in_data is sent, can be used to dequeue the item from fifo   
+    output logic finish, // one byte is sent
     
     input logic s_tick, //input from baudrate generator
-    output logic tick_rst // use this to reset baudrate generator
+    output logic tick_rst, // use this to reset baudrate generator
+    
+    output logic data_acquired //in_data is sent, can be used to dequeue the item from fifo  
     
     );
     
@@ -42,6 +44,7 @@ module transmitter(
     logic [7:0] r_in_data,next_data;
     logic [5:0] r_over_sample_count,next_over_sample_count;
      logic [5:0] r_bit_count,next_bit_count;
+     logic r_data_acquired,next_data_acquired;
      
     always_ff @(posedge clk,negedge nrst)
         begin
@@ -54,6 +57,7 @@ module transmitter(
                     r_finish<=0;
                     r_over_sample_count<=0;
                     r_bit_count<=0;
+                    r_data_acquired<=0;
                 end
              else
                 begin
@@ -64,6 +68,7 @@ module transmitter(
                      r_finish<=next_finish;
                      r_over_sample_count<=next_over_sample_count;
                      r_bit_count<=next_bit_count;
+                     r_data_acquired<=next_data_acquired;                     
                  end
         end
     
@@ -78,6 +83,7 @@ module transmitter(
             next_tx=r_tx;
             next_over_sample_count=r_over_sample_count;
             next_bit_count=r_bit_count;
+            next_data_acquired=0;
         case (r_current_state)
         IDLE:
             begin
@@ -91,6 +97,7 @@ module transmitter(
                         next_over_sample_count=0;
                         next_tx=0;
                         next_bit_count=0;
+                        next_data_acquired=1;
                     end
             end
         START:
@@ -147,4 +154,5 @@ module transmitter(
     assign tx= r_tx;
     assign finish=r_finish;
     assign tick_rst=r_s_tick_rst;
+    assign data_acquired=r_data_acquired;
 endmodule

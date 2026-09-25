@@ -36,6 +36,8 @@ module top(
     logic write_enable;
     logic read_enable;// read operation is asynchronous, this signal just pop the data from FIFO.
     
+    logic transmit_finished;
+    
     logic[7:0] fifo_read;
     logic[7:0] fifo_write;
     logic fifo_empty;
@@ -57,8 +59,8 @@ module top(
     .tx(tx),
     .in_data(fifo_read),
     .enable(!fifo_empty),// means in_data is valid and should be transmitted
-    .finish(read_enable),//in_data is sent, can be used to dequeue the item from fifo   
-    
+    .finish(transmit_finished),//in_data is sent, can be used to dequeue the item from fifo   
+    .data_acquired(read_enable),
     .s_tick(baud_gen_tick), //input from baudrate generator
     .tick_rst(baud_gen_rst) // use this to reset baudrate generator
    );
