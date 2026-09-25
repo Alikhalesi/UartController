@@ -80,16 +80,19 @@ module transmitter(
             next_bit_count=r_bit_count;
         case (r_current_state)
         IDLE:
-            if(enable)
-                begin
-                    next_state=START;
-                    next_data=in_data;
-                    next_s_tick_rst=1;
-                    next_finish=0;
-                    next_over_sample_count=0;
-                    next_tx=0;
-                    next_bit_count=0;
-                end
+            begin
+                next_tx=1;
+                if(enable)
+                    begin
+                        next_state=START;
+                        next_data=in_data;
+                        next_s_tick_rst=1;
+                        next_finish=0;
+                        next_over_sample_count=0;
+                        next_tx=0;
+                        next_bit_count=0;
+                    end
+            end
         START:
             begin
                 if (r_over_sample_count==16)

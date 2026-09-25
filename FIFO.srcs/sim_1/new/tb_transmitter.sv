@@ -130,11 +130,20 @@ module tb_transmitter(
 
         // --- Test Case 2: Send 0xA3 (10100011) ---
         @(posedge clk);
-        in_data = 8'hA3;
+        in_data = 8'h41;
         enable  = 1;
         
         @(posedge clk);
         enable  = 0;
+        
+        @(posedge finish);
+        @(posedge clk);
+        in_data = 8'h42;
+        enable  = 1;
+        
+          @(posedge clk);
+        enable  = 0;
+        
         
         @(posedge finish);
         $display("[TESTCASE 2] Finish flagged for 0xA3 at %0t ns", $time);
