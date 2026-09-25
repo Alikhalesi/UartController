@@ -21,14 +21,26 @@
 
 
 module top(
- (* mark_debug = "true" *)   input logic rx,
-  (* mark_debug = "true" *)  output logic tx,
+  input logic rx,
+ output logic tx,
     input logic clk,
     input logic nsrt,
     output logic led,
     output logic [7:0] sseg_ctrl,
     output logic [7:0] sseg_data
         );
+    
+    
+    
+    (* mark_debug = "true" *) logic rx_reg;
+(* mark_debug = "true" *) logic tx_reg;
+
+// 2. Sample them using your clock matrix
+always_ff @(posedge clk) begin
+    rx_reg <= rx;
+    tx_reg <= tx;
+end
+    
     
     logic synced_rst;
     reset_synchronizer rst_synchronizer(.nrst(nsrt),.clk(clk),.sync_nrst(synced_rst));
@@ -91,7 +103,7 @@ assign sseg_ctrl[7:4]=hard_sseg_ctrl;
 assign start_signal=write_enable;
  logic finished_signal;
 logic [7:0] clocked_writed_data;
-sseg_mux seven_mux(.number( {8'b0,clocked_writed_data} ),
+sseg_mux seven_mux(.number( {8'b0,fifo_write} ),
 .ctrl(sseg_ctrl[3:0]),
 .data(sseg_data),
 .start_signal(start_signal),

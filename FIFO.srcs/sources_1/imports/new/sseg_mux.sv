@@ -31,6 +31,7 @@ input logic nRst
     );
     
     
+    logic ready;
     logic [1:0] current_segment;
     logic [3:0] current_value;
     
@@ -39,38 +40,34 @@ input logic nRst
     logic binary_decode_finished;  
     logic [15:0] registered_number;
    
+    assign finished_signal= ready;
     
     
-    
-    typedef enum logic[1:0] { IDLE=2'b0,DECODING=2'b01,RENDERING=2'b10} state;
+    typedef enum logic[1:0] { IDLE=2'b0,DECODING=2'b01,FINISHED=2'b10} state;
     state current_state,next_state;
-    
-    
     
         always_ff @(posedge clk or negedge nRst) begin
         if (!nRst) 
             current_state <= IDLE;
         else 
             current_state <= next_state;
-     
     end
     
-    
+    localparam RENDERING_TIME=28'd000_100_000;
     
     binary_to_decimal_16bit bintodec(.clk(clk),.rst_n(nRst),.start(start_binary_decoding),
     .binary_in(registered_number),.bcd_out(dec_value),.ready(binary_decode_finished));
 
 
-    logic [15:0] delay;
+    logic [27:0] delay;
+
     always_ff @(posedge clk, negedge nRst)  begin
     if (!nRst)
         begin
             start_binary_decoding<=1'b0;
             registered_number<=16'b0;
-            current_segment<=2'b0;
-            delay<=16'h0000;
-            next_state<=IDLE;
-            finished_signal<=1'b1;
+            ready<=1'b1;
+          
         end
     else
     
@@ -79,30 +76,18 @@ input logic nRst
         begin
         if(start_signal)
             begin
-                finished_signal<=1'b0;
                 registered_number<=number;
-                start_binary_decoding<=1'b1;
-                next_state<=DECODING;
+                start_binary_decoding<=1'b1;                
+                ready<=1'b0;
             end
         end
-    DECODING:
-        begin
-            if(binary_decode_finished)
-                next_state<=RENDERING;      
-        end
-    RENDERING:
-        begin
-                  if (delay<16'hFFFF)
-                          delay<=delay+1'b1;
-                  else
-                     begin    
-                         current_segment<=current_segment+1;
-                          delay<=16'h0000;
-                          next_state<=IDLE;
-                          finished_signal<=1'b1;  
-                     end
-        end
         
+        FINISHED:
+        begin
+         ready<=1'b1;
+        start_binary_decoding<=1'b0;   
+         end
+   //     default:current_state<=current_state;
     endcase
      
     end
@@ -110,19 +95,78 @@ input logic nRst
     
     
     
+    //next_state logic
+       always_comb begin
+       next_state=current_state;
+        case (current_state)
+    IDLE:
+        begin
+            if(start_signal)
+                next_state=DECODING;
+        end
+    DECODING:
+        begin
+            if(binary_decode_finished)
+                next_state=FINISHED;
+                
+        end
+  
+        FINISHED:
+          next_state=IDLE;
+        
+        default: next_state=current_state;
+        endcase
+        
+       end
+    
+    
+    
+      always_ff @(posedge clk, negedge nRst)  begin
+    if (!nRst)
+        begin
+          delay<=28'd0;
+  
+        current_segment<=2'b11;
+        end
+    else
+  if (delay<RENDERING_TIME)
+                          delay<=delay+1'b1;
+                          else
+                          begin
+    current_segment<=current_segment-1'b1;
+    delay<=28'd0;
+    end
+    
+    end
     
     //Output logic
     
     always_comb begin
-//    current_value=dec_value[3:0];
+  ctrl=4'b1111;
     case (current_segment)
-    2'b01: current_value=dec_value[7:4];
-    2'b10: current_value=dec_value[11:8];
-    2'b11: current_value=dec_value[15:12];
-    default:  current_value=dec_value[3:0];
+  
+    2'b01:
+        begin
+            current_value=dec_value[7:4];
+            ctrl=4'b1101;
+        end
+    2'b10:
+        begin 
+            current_value=dec_value[11:8];
+            ctrl=4'b1011;
+        end
+    2'b11: 
+        begin
+            current_value=dec_value[15:12];
+                ctrl=4'b0111;
+        end
+    default:  
+        begin
+            current_value=dec_value[3:0];
+            ctrl=4'b1110;
+        end
     endcase
-    ctrl=4'b1111;
-    ctrl[current_segment]=1'b0;
+
     
     
     end
