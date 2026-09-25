@@ -25,8 +25,10 @@ module top(
   (* mark_debug = "true" *)  output logic tx,
     input logic clk,
     input logic nsrt,
-    output logic led
-    );
+    output logic led,
+    output logic [7:0] sseg_ctrl,
+    output logic [7:0] sseg_data
+        );
     
     logic synced_rst;
     reset_synchronizer rst_synchronizer(.nrst(nsrt),.clk(clk),.sync_nrst(synced_rst));
@@ -78,12 +80,41 @@ module top(
 .data_out(fifo_write), 
 .data_ready(write_enable));
 
+
+
+
+
+logic[3:0] hard_sseg_ctrl=4'b1111;
+assign sseg_ctrl[7:4]=hard_sseg_ctrl;
+assign start_signal=write_enable;
+ logic finished_signal;
+logic [7:0] clocked_writed_data;
+sseg_mux seven_mux(.number( {8'b0,clocked_writed_data} ),
+.ctrl(sseg_ctrl[3:0]),
+.data(sseg_data),
+.start_signal(start_signal),
+.finished_signal(finished_signal),
+.clk(clk),
+.nRst(synced_rst));
+
+
 logic r_led;
 
 always_ff @(posedge clk)
 begin
-if(rx_baud_gen_tick)
-r_led<=!r_led;
+    if (!synced_rst)
+        clocked_writed_data<=0;
+    else
+    
+        begin
+            if (write_enable)
+            begin
+                clocked_writed_data<=fifo_write;
+                r_led<=1;
+            end
+        end
+
+
 
 
 end
