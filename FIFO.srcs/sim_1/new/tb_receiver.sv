@@ -172,6 +172,9 @@ baud_gen buad_gen_instance(.clk(clk),.nrst(nrst),.rst(s_tick_rst),.tick(s_tick))
 
         // --- Run Tests ---
            
+                send_uart_byte(8'h41); 
+                send_uart_byte(8'h42); 
+           
         send_uart_byte(8'b01010101); // Alternating bits
         send_uart_byte(8'hA5); // Mixed pattern
      send_uart_byte(8'hFF); // All ones

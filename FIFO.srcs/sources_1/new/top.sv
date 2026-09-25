@@ -21,8 +21,8 @@
 
 
 module top(
-    input logic rx,
-    output logic tx,
+ (* mark_debug = "true" *)   input logic rx,
+  (* mark_debug = "true" *)  output logic tx,
     input logic clk,
     input logic nsrt,
     output logic led
@@ -78,7 +78,16 @@ module top(
 .data_out(fifo_write), 
 .data_ready(write_enable));
 
-assign led=write_enable;
+logic r_led;
 
+always_ff @(posedge clk)
+begin
+if(rx_baud_gen_tick)
+r_led<=!r_led;
+
+
+end
+
+assign led=r_led;
     
 endmodule
