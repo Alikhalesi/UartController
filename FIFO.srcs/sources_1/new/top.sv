@@ -95,15 +95,17 @@ end
 .data_ready(write_enable));
 
 
+logic [3:0] decoded_data;
 
+ascii_decoder decoder(.ascii_data_in(fifo_write),.decimal_data_out(decoded_data));
 
 
 logic[3:0] hard_sseg_ctrl=4'b1111;
 assign sseg_ctrl[7:4]=hard_sseg_ctrl;
 assign start_signal=write_enable;
  logic finished_signal;
-logic [7:0] clocked_writed_data;
-sseg_mux seven_mux(.number( {8'b0,fifo_write} ),
+
+sseg_mux seven_mux(.number( {12'b0,decoded_data} ),
 .ctrl(sseg_ctrl[3:0]),
 .data(sseg_data),
 .start_signal(start_signal),
@@ -111,28 +113,6 @@ sseg_mux seven_mux(.number( {8'b0,fifo_write} ),
 .clk(clk),
 .nRst(synced_rst));
 
-
-logic r_led;
-
-always_ff @(posedge clk)
-begin
-    if (!synced_rst)
-        clocked_writed_data<=0;
-    else
-    
-        begin
-            if (write_enable)
-            begin
-                clocked_writed_data<=fifo_write;
-                r_led<=1;
-            end
-        end
-
-
-
-
-end
-
-assign led=r_led;
+assign led=1'b1;
     
 endmodule

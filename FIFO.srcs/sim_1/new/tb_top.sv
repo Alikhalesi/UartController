@@ -106,13 +106,13 @@ module tb_top(
         #(CLK_PERIOD * 10);
 
         // --- Test Case 1: Send a single character 'A' (0x41) ---
-        send_uart_byte(8'h41);
+        send_uart_byte(8'h48);
 
         // Wait enough time for the receiver to push to FIFO and transmitter to finish echoing it out
         #(BIT_PERIOD * 12);
 
         // --- Test Case 2: Send a secondary character 'B' (0x42) ---
-        send_uart_byte(8'h42);
+        send_uart_byte(8'h53);
         
         // Wait for final transmission finish
         #(BIT_PERIOD * 15);
